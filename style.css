@@ -1,0 +1,533 @@
+/* ... (Previous variable definitions remain same) ... */
+:root {
+    /* === LIGHT MODE VARIABLES (Default) === */
+    --bg-color: #EAEAE5;
+    --grid-line: #D0D0D0;
+    --grid-size: 40px;
+
+    --text-main: #111111;
+    --text-dim: #555555;
+    --border-color: #111111;
+    --border-dim: #AAAAAA;
+
+    --accent-color: #0055AA;
+    /* Technical Blue */
+    --accent-dim: rgba(0, 85, 170, 0.1);
+
+    --card-bg: rgba(255, 255, 255, 0.6);
+    /* Slightly more opaque for cards */
+    --card-border: #0055AA;
+
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+body.dark-mode {
+    /* === DARK MODE VARIABLES === */
+    --bg-color: #1A1A1A;
+    --grid-line: #333333;
+
+    --text-main: #FFFFFF;
+    --text-dim: #AAAAAA;
+    --border-color: #FFFFFF;
+    --border-dim: #555555;
+
+    --accent-color: #00E0FF;
+    /* Neon Cyan */
+    --accent-dim: rgba(0, 224, 255, 0.1);
+
+    --card-bg: rgba(0, 0, 0, 0.5);
+    --card-border: #00E0FF;
+}
+
+/* ... (Previous global styles: *, body, .technical-grid, .app-container) ... */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.technical-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ... (Previous Header Styles) ... */
+.blueprint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.header-box {
+    border: 2px solid var(--border-color);
+    padding: 10px 15px;
+    background: var(--bg-color);
+}
+
+.header-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.header-meta {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    display: flex;
+    gap: 15px;
+}
+
+.controls-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    background: var(--bg-color);
+    cursor: pointer;
+}
+
+.toggle-switch:hover {
+    background: var(--accent-dim);
+}
+
+.mode-btn {
+    background: none;
+    border: none;
+    font-family: var(--font-mono);
+    color: var(--accent-color);
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+/* === NEW BUTTON STYLES === */
+.save-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    font-family: var(--font-mono);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background: var(--accent-dim);
+}
+
+.add-card-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed var(--border-dim);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    cursor: pointer;
+    text-align: center;
+    font-weight: bold;
+}
+
+.add-card-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--accent-dim);
+}
+
+.delete-card-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 1rem;
+}
+
+.blueprint-card:hover .delete-card-btn {
+    opacity: 1;
+}
+
+.delete-card-btn:hover {
+    color: red;
+}
+
+
+/* ... (Previous Kanban Board Layout) ... */
+.kanban-board {
+    display: flex;
+    flex: 1;
+    border-top: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.kanban-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-top: 10px;
+    min-width: 300px;
+}
+
+.column-border-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, var(--border-dim), var(--border-dim) 5px, transparent 5px, transparent 10px);
+}
+
+#col-todo .column-border-right,
+#col-progress .column-border-right {
+    display: block;
+}
+
+.column-header {
+    padding: 0 15px 10px 15px;
+}
+
+.zone-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.header-line {
+    height: 2px;
+    background-color: var(--border-color);
+    width: 100%;
+}
+
+.column-content {
+    flex: 1;
+    padding: 10px 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.column-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background-color: var(--border-dim);
+}
+
+.column-content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* ... (Previous Card Styles) ... */
+.blueprint-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    padding: 15px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: grab;
+}
+
+.blueprint-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 2px 2px 0px var(--border-dim);
+    z-index: 10;
+}
+
+.blueprint-card:active {
+    cursor: grabbing;
+}
+
+.card-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.marker-tl,
+.marker-tr,
+.marker-bl,
+.marker-br {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--text-main);
+}
+
+.marker-tl {
+    top: -1px;
+    left: -1px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.marker-tr {
+    top: -1px;
+    right: -1px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.marker-bl {
+    bottom: -1px;
+    left: -1px;
+    border-right: none;
+    border-top: none;
+}
+
+.marker-br {
+    bottom: -1px;
+    right: -1px;
+    border-left: none;
+    border-top: none;
+}
+
+.card-id {
+    font-size: 0.7rem;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.card-title {
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.card-body {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+}
+
+.tag {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Status Blink (Optional, can be used dynamically) */
+.status-blink {
+    font-weight: bold;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ... (Previous Footer) ... */
+.blueprint-footer {
+    margin-top: 20px;
+    position: relative;
+    height: 40px;
+}
+
+.footer-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 180px;
+    height: 2px;
+    background-color: var(--border-color);
+}
+
+.legend-box {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    border: 1px solid var(--border-color);
+    padding: 5px 15px;
+    background: var(--bg-color);
+    font-size: 0.75rem;
+    display: flex;
+    gap: 10px;
+}
+
+
+/* === MODAL STYLES === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-content.blueprint-card {
+    width: 400px;
+    background-color: var(--bg-color);
+    /* Maintain theme bg */
+    border: 2px solid var(--accent-color);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2);
+    cursor: default;
+    /* Reset cursor */
+}
+
+/* Override hover effect for modal */
+.modal-content.blueprint-card:hover {
+    transform: none;
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 10px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-main);
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border-dim);
+    padding: 8px;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.modal-footer {
+    text-align: right;
+}
+
+.action-btn {
+    background: var(--accent-color);
+    color: var(--bg-color);
+    /* Invert for contrast */
+    border: none;
+    padding: 8px 15px;
+    font-family: var(--font-mono);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .kanban-board {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .kanban-column {
+        min-width: 100%;
+        border-bottom: 1px dashed var(--border-dim);
+    }
+
+    .column-border-right {
+        display: none !important;
+    }
+}

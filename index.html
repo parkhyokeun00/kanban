@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brutalist Kanban / Project #3372</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="light-mode">
+    <div class="technical-grid"></div>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="blueprint-header">
+            <div class="header-box">
+                <div class="header-title">BRUTALIST DIAGRAM / KANBAN</div>
+                <div class="header-meta">
+                    <span>DWG: IS-00001A</span>
+                    <span>SHEET: 1/1</span>
+                    <span>REV: 01</span>
+                </div>
+            </div>
+
+            <div class="controls-box">
+                <div class="toggle-switch">
+                    <span class="label">MODE:</span>
+                    <button id="theme-toggle" class="mode-btn">LIGHT</button>
+                </div>
+                <!-- Save Button Added -->
+                <button id="save-data-btn" class="save-btn">[SAVE DATA]</button>
+            </div>
+        </header>
+
+        <!-- Main Kanban Board -->
+        <main class="kanban-board">
+
+            <!-- Column 1: INPUT -->
+            <section class="kanban-column" id="col-todo" data-status="todo">
+                <div class="column-header">
+                    <span class="zone-label">ZONE 01: INPUT</span>
+                    <div class="header-line"></div>
+                </div>
+                <div class="column-content disable-scroll">
+                    <!-- Cards will be dynamically loaded here via JS -->
+                </div>
+                <!-- Add Card Button for Column 1 -->
+                <button class="add-card-btn" onclick="addNewCard('col-todo')">+ ADD REQ</button>
+                <div class="column-border-right"></div>
+            </section>
+
+            <!-- Column 2: PROCESSING -->
+            <section class="kanban-column" id="col-progress" data-status="progress">
+                <div class="column-header">
+                    <span class="zone-label">ZONE 02: PROCESSING</span>
+                    <div class="header-line"></div>
+                </div>
+                <div class="column-content">
+                    <!-- Cards will be dynamically loaded here via JS -->
+                </div>
+                <!-- Add Card Button for Column 2 -->
+                <button class="add-card-btn" onclick="addNewCard('col-progress')">+ ADD TASK</button>
+                <div class="column-border-right"></div>
+            </section>
+
+            <!-- Column 3: OUTPUT -->
+            <section class="kanban-column" id="col-done" data-status="done">
+                <div class="column-header">
+                    <span class="zone-label">ZONE 03: OUTPUT</span>
+                    <div class="header-line"></div>
+                </div>
+                <div class="column-content">
+                    <!-- Cards will be dynamically loaded here via JS -->
+                </div>
+                <!-- Add Card Button for Column 3 -->
+                <button class="add-card-btn" onclick="addNewCard('col-done')">+ ADD LOG</button>
+            </section>
+
+        </main>
+
+        <!-- Footer / Legend -->
+        <footer class="blueprint-footer">
+            <div class="footer-line"></div>
+            <div class="legend-box">
+                <span id="save-status">SYSTEM READY</span>
+                <span class="separator">|</span>
+                <span>PROJECT #0001</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal for New Card (Hidden by default) -->
+    <div id="card-modal" class="modal-overlay hidden">
+        <div class="modal-content blueprint-card">
+            <div class="modal-header">
+                <span class="modal-title">NEW SPECIFICATION ENTRY</span>
+                <button class="close-modal-btn">X</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ID CODE:</label>
+                    <input type="text" id="input-id" placeholder="REQ-000">
+                </div>
+                <div class="form-group">
+                    <label>TITLE:</label>
+                    <input type="text" id="input-title" placeholder="ENTER TASK NAME">
+                </div>
+                <div class="form-group">
+                    <label>DETAILS:</label>
+                    <textarea id="input-details" rows="3" placeholder="Technical description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>TAG:</label>
+                    <input type="text" id="input-tag" placeholder="[SYSTEM]">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-add-btn" class="action-btn">EXECUTE ADD</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

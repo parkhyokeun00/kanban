@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencil Design Preview</title>
+    <style>
+        body { margin: 0; padding: 20px; background-color: #f0f0f0; font-family: sans-serif; }
+        #canvas { position: relative; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .element { position: absolute; box-sizing: border-box; }
+        .text-element { display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div id="canvas"></div>
+
+    <script>
+        const pencilData = {
+          "version": "2.7",
+          "children": [
+            {
+              "type": "frame",
+              "id": "main-frame",
+              "x": 0,
+              "y": 0,
+              "name": "Kanban Board",
+              "clip": true,
+              "width": 800,
+              "height": 600,
+              "fill": "#F4F7F6",
+              "layout": "none",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "app-header",
+                  "x": 0,
+                  "y": 0,
+                  "width": 800,
+                  "height": 60,
+                  "fill": "#2C3E50",
+                  "stroke": "none"
+                },
+                {
+                  "type": "text",
+                  "id": "app-title",
+                  "x": 20,
+                  "y": 15,
+                  "text": "Project Alpha Board",
+                  "fontSize": 24,
+                  "fontWeight": "bold",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "col-todo",
+                  "x": 20,
+                  "y": 80,
+                  "width": 240,
+                  "height": 500,
+                  "fill": "#EBECF0",
+                  "stroke": "#DFE1E6",
+                  "cornerRadius": 8
+                },
+                {
+                  "type": "text",
+                  "id": "header-todo",
+                  "x": 35,
+                  "y": 95,
+                  "text": "To Do",
+                  "fontSize": 16,
+                  "fontWeight": "bold",
+                  "fill": "#172B4D"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "card-1",
+                  "x": 30,
+                  "y": 130,
+                  "width": 220,
+                  "height": 100,
+                  "fill": "#FFFFFF",
+                  "stroke": "none",
+                  "cornerRadius": 4,
+                  "shadow": "0 1px 2px rgba(9, 30, 66, 0.25)"
+                },
+                {
+                  "type": "text",
+                  "id": "card-1-text",
+                  "x": 40,
+                  "y": 165,
+                  "text": "Research MCP System",
+                  "fontSize": 14,
+                  "fill": "#172B4D"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "col-inprogress",
+                  "x": 280,
+                  "y": 80,
+                  "width": 240,
+                  "height": 500,
+                  "fill": "#EBECF0",
+                  "stroke": "#DFE1E6",
+                  "cornerRadius": 8
+                },
+                {
+                  "type": "text",
+                  "id": "header-inprogress",
+                  "x": 295,
+                  "y": 95,
+                  "text": "In Progress",
+                  "fontSize": 16,
+                  "fontWeight": "bold",
+                  "fill": "#172B4D"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "col-done",
+                  "x": 540,
+                  "y": 80,
+                  "width": 240,
+                  "height": 500,
+                  "fill": "#EBECF0",
+                  "stroke": "#DFE1E6",
+                  "cornerRadius": 8
+                },
+                {
+                  "type": "text",
+                  "id": "header-done",
+                  "x": 555,
+                  "y": 95,
+                  "text": "Done",
+                  "fontSize": 16,
+                  "fontWeight": "bold",
+                  "fill": "#172B4D"
+                }
+              ]
+            }
+          ]
+        };
+
+        function render(data) {
+            const canvas = document.getElementById('canvas');
+            
+            // Find root frame
+            let root = data.children.find(c => c.type === 'frame');
+            if (!root) return;
+
+            canvas.style.width = root.width + 'px';
+            canvas.style.height = root.height + 'px';
+            canvas.style.backgroundColor = root.fill;
+
+            if (root.children) {
+                root.children.forEach(child => {
+                    const el = document.createElement('div');
+                    el.className = 'element';
+                    el.style.left = child.x + 'px';
+                    el.style.top = child.y + 'px';
+                    
+                    if (child.width) el.style.width = child.width + 'px';
+                    if (child.height) el.style.height = child.height + 'px';
+                    
+                    if (child.fill) el.style.backgroundColor = child.fill;
+                    if (child.stroke && child.stroke !== 'none') el.style.border = `1px solid ${child.stroke}`;
+                    if (child.cornerRadius) el.style.borderRadius = child.cornerRadius + 'px';
+                    if (child.shadow) el.style.boxShadow = child.shadow;
+
+                    if (child.type === 'text') {
+                        el.innerText = child.text;
+                        el.className += ' text-element';
+                        if (child.fontSize) el.style.fontSize = child.fontSize + 'px';
+                        if (child.fontWeight) el.style.fontWeight = child.fontWeight;
+                        if (child.fill) el.style.color = child.fill;
+                        el.style.backgroundColor = 'transparent'; // Text background usually transparent
+                        el.style.justifyContent = 'flex-start'; // Align text left
+                        el.style.alignItems = 'flex-start';
+                        // Reset width/height for text if not specified or to allow auto-size
+                        el.style.width = 'auto';
+                        el.style.height = 'auto';
+                        el.style.whiteSpace = 'nowrap';
+                    }
+
+                    canvas.appendChild(el);
+                });
+            }
+        }
+
+        render(pencilData);
+    </script>
+</body>
+</html>

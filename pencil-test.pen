@@ -1,0 +1,755 @@
+{
+  "version": "2.7",
+  "children": [
+    {
+      "type": "frame",
+      "id": "lObvM",
+      "x": 0,
+      "y": 0,
+      "name": "Kanban Board",
+      "width": 800,
+      "height": 600,
+      "fill": "#F4F7F6",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "Myh2e",
+          "name": "Header",
+          "fill": "#2C3E50",
+          "width": 800,
+          "height": 60
+        },
+        {
+          "type": "text",
+          "id": "nMa7Z",
+          "name": "App Title",
+          "fill": "#FFFFFF",
+          "content": "Project Alpha Board",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "ellipse",
+          "id": "y6zPn",
+          "name": "Profile",
+          "fill": "#3498DB",
+          "width": 30,
+          "height": 30
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "RWKEV",
+          "name": "Col: To Do",
+          "fill": "#EBECF0",
+          "width": 240,
+          "height": 500
+        },
+        {
+          "type": "text",
+          "id": "EbWJq",
+          "name": "todoHeader",
+          "fill": "#172B4D",
+          "content": "To Do",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "dcDuT",
+          "name": "todoCount",
+          "fill": "#5E6C84",
+          "content": "3",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 4,
+          "id": "7CpF6",
+          "name": "Card 1",
+          "fill": "#FFFFFF",
+          "width": 220,
+          "height": 100
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 4,
+          "id": "lNYH7",
+          "name": "tagBg",
+          "fill": "#61BD4F",
+          "width": 50,
+          "height": 16
+        },
+        {
+          "type": "text",
+          "id": "Uc8eU",
+          "name": "tagText",
+          "fill": "#FFFFFF",
+          "content": "Design",
+          "fontFamily": "Inter",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "t8JhU",
+          "name": "cardText",
+          "fill": "#172B4D",
+          "content": "Research MCP System",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "ellipse",
+          "id": "TCAFh",
+          "name": "avatar",
+          "fill": "#E67E22",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "091ku",
+          "name": "Col: In Progress",
+          "fill": "#EBECF0",
+          "width": 240,
+          "height": 500
+        },
+        {
+          "type": "text",
+          "id": "VKaEc",
+          "name": "progHeader",
+          "fill": "#172B4D",
+          "content": "In Progress",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "Rkz40",
+          "name": "Col: Done",
+          "fill": "#EBECF0",
+          "width": 240,
+          "height": 500
+        },
+        {
+          "type": "text",
+          "id": "cJFKM",
+          "name": "doneHeader",
+          "fill": "#172B4D",
+          "content": "Done",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "ellipse",
+          "id": "SkZV3",
+          "name": "FAB",
+          "fill": "#0079BF",
+          "width": 50,
+          "height": 50
+        },
+        {
+          "type": "text",
+          "id": "8hHs0",
+          "name": "fabIcon",
+          "fill": "#FFFFFF",
+          "content": "+",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "bold"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "36av1",
+      "x": 0,
+      "y": 0,
+      "name": "Blueprint Kanban",
+      "width": 800,
+      "height": 600,
+      "fill": "#EAEAE5",
+      "children": [
+        {
+          "type": "line",
+          "id": "yKp5r",
+          "name": "l1",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "EDsWD",
+          "name": "l2",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "g88zj",
+          "name": "l3",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "CtMZQ",
+          "name": "l4",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "B4SyD",
+          "name": "l5",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "jrI9S",
+          "name": "headBox",
+          "fill": "none",
+          "width": 300,
+          "height": 60
+        },
+        {
+          "type": "text",
+          "id": "YlA77",
+          "name": "headTitle",
+          "fill": "#000000",
+          "content": "BRUTALIST DIAGRAM / KANBAN",
+          "fontFamily": "monospace",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "Bodw1",
+          "name": "headSub",
+          "fill": "#555555",
+          "content": "DWG: IS-59704C | SHEET 1/1 | REV: 00",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "line",
+          "id": "dFZQW",
+          "name": "col1Line",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "K20X5",
+          "name": "col1Label",
+          "fill": "#000000",
+          "content": "ZONE 01: INPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "j665O",
+          "name": "col1VLine",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "HMQnm",
+          "name": "col2Line",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "eTuxY",
+          "name": "col2Label",
+          "fill": "#000000",
+          "content": "ZONE 02: PROCESSING",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "koA4i",
+          "name": "col2VLine",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "6MWev",
+          "name": "col3Line",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "wNOr7",
+          "name": "col3Label",
+          "fill": "#000000",
+          "content": "ZONE 03: OUTPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "rectangle",
+          "id": "nsDR0",
+          "name": "c1",
+          "fill": "none",
+          "width": 220,
+          "height": 90
+        },
+        {
+          "type": "rectangle",
+          "id": "7Z8D7",
+          "name": "c1Inner",
+          "fill": "rgba(0, 85, 170, 0.05)",
+          "width": 210,
+          "height": 80
+        },
+        {
+          "type": "text",
+          "id": "BwImm",
+          "name": "c1Title",
+          "fill": "#0055AA",
+          "content": "REQ-402: RESEARCH",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "31Bld",
+          "name": "c1Detail",
+          "fill": "#333333",
+          "content": "Analyze MCP specs.",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "ctnPE",
+          "name": "c1Spec",
+          "fill": "#0055AA",
+          "content": "[SYS-CORE]",
+          "fontFamily": "monospace",
+          "fontSize": 9,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "line",
+          "id": "xhYi5",
+          "name": "xm1",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "C4eHn",
+          "name": "xm2",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "jg0se",
+          "name": "c2",
+          "fill": "none",
+          "width": 220,
+          "height": 140
+        },
+        {
+          "type": "rectangle",
+          "id": "LApPg",
+          "name": "c2Header",
+          "fill": "#000000",
+          "width": 220,
+          "height": 20
+        },
+        {
+          "type": "text",
+          "id": "c4Hwk",
+          "name": "c2Title",
+          "fill": "#FFFFFF",
+          "content": "TASK-88: MOCKUP",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "ag21V",
+          "name": "c2Detail",
+          "fill": "#333333",
+          "content": "Wireframe UI\nGenerate Assets\nReview Specs",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "rtyR5",
+          "name": "c2Status",
+          "fill": "#000000",
+          "content": "STATUS: ACTIVE",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "KfagS",
+          "name": "footLine",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "Oqqjh",
+          "name": "legendBox",
+          "fill": "none",
+          "width": 180,
+          "height": 30
+        },
+        {
+          "type": "text",
+          "id": "oAI8k",
+          "name": "legendText",
+          "fill": "#000000",
+          "content": "PROJECT #3372",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "BvLQX",
+      "x": 1810,
+      "y": 641,
+      "name": "Frame 1",
+      "clip": true,
+      "width": 6,
+      "height": 1,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    },
+    {
+      "type": "frame",
+      "id": "6MVLd",
+      "x": 0,
+      "y": -734,
+      "name": "Dark Mode (CAD)",
+      "width": 800,
+      "height": 600,
+      "fill": "#1A1A1A",
+      "children": [
+        {
+          "type": "line",
+          "id": "Zm3bH",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "nBGEF",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "hMmfg",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "Uq9i4",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "MByZJ",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "XaxOY",
+          "fill": "none",
+          "width": 300,
+          "height": 60
+        },
+        {
+          "type": "text",
+          "id": "pQG8u",
+          "fill": "#FFFFFF",
+          "content": "BRUTALIST / DARK",
+          "fontFamily": "monospace",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "CO9v6",
+          "fill": "#AAAAAA",
+          "content": "DWG: A-02 | REV: 01",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "gaZso",
+          "fill": "#FFFFFF",
+          "content": "ZONE 01: INPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "pz8Ev",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "hnfsr",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "2RT46",
+          "fill": "#FFFFFF",
+          "content": "ZONE 02: PROCESS",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "va9n9",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "K0AmL",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "3MhW8",
+          "fill": "#FFFFFF",
+          "content": "ZONE 03: OUTPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "QVCtk",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "ubhFx",
+          "fill": "none",
+          "width": 220,
+          "height": 90
+        },
+        {
+          "type": "text",
+          "id": "vPQDO",
+          "fill": "#00E0FF",
+          "content": "REQ-402",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "D1JQC",
+          "fill": "#DDDDDD",
+          "content": "Analyze MCP specs.",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lEeRR",
+      "x": 0,
+      "y": 0,
+      "name": "Light Mode (Blueprint)",
+      "width": 800,
+      "height": 600,
+      "fill": "#EAEAE5",
+      "children": [
+        {
+          "type": "line",
+          "id": "DGU5N",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "PuMEH",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "xB7oK",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "7B6vh",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "WFnsw",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "41C0L",
+          "fill": "none",
+          "width": 300,
+          "height": 60
+        },
+        {
+          "type": "text",
+          "id": "OoQ3X",
+          "fill": "#000000",
+          "content": "BRUTALIST / LIGHT",
+          "fontFamily": "monospace",
+          "fontSize": 16,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "2HAgK",
+          "fill": "#555555",
+          "content": "DWG: A-01 | REV: 01",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "LIMGM",
+          "fill": "#000000",
+          "content": "ZONE 01: INPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "J47iB",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "4moZd",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "rimrI",
+          "fill": "#000000",
+          "content": "ZONE 02: PROCESS",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "k5aDp",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "line",
+          "id": "CaGX1",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "text",
+          "id": "Q7qS2",
+          "fill": "#000000",
+          "content": "ZONE 03: OUTPUT",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "line",
+          "id": "LEVHk",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "rectangle",
+          "id": "PM20F",
+          "fill": "none",
+          "width": 220,
+          "height": 90
+        },
+        {
+          "type": "text",
+          "id": "gMtoF",
+          "fill": "#0055AA",
+          "content": "REQ-402",
+          "fontFamily": "monospace",
+          "fontSize": 12,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "RmZyM",
+          "fill": "#333333",
+          "content": "Analyze MCP specs.",
+          "fontFamily": "monospace",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ]
+}
