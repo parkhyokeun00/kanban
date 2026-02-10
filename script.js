@@ -1,231 +1,508 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- STATE MANAGEMENT ---
-    let tasks = [];
-    const LOCAL_STORAGE_KEY = 'brutalist_kanban_data';
-    let currentTheme = localStorage.getItem('theme') || 'light-mode';
+﻿(() => {
+  const STORAGE_KEY = 'focus_list_v3';
+  const VIEW_KEY = 'focus_list_view';
+  const DAILY_SYNC_KEY = 'focus_list_daily_sync_date';
+  const WIP_LIMIT_NOW = 3;
 
-    // --- DOM ELEMENTS ---
-    const body = document.body;
-    const toggleBtn = document.getElementById('theme-toggle');
-    const saveBtn = document.getElementById('save-data-btn');
-    const saveStatus = document.getElementById('save-status');
-    const modal = document.getElementById('card-modal');
-    const closeModalBtn = document.querySelector('.close-modal-btn');
-    const confirmAddBtn = document.getElementById('confirm-add-btn');
+  const ORDER = ['later', 'today', 'now', 'done'];
+  const LABELS = {
+    later: '나중에',
+    today: '오늘할일',
+    now: '지금',
+    done: '완료'
+  };
 
-    // Inputs
-    const inputId = document.getElementById('input-id');
-    const inputTitle = document.getElementById('input-title');
-    const inputDetails = document.getElementById('input-details');
-    const inputTag = document.getElementById('input-tag');
+  const SUB_ORDER = ['prep', 'doing', 'done'];
+  const SUB_LABELS = {
+    prep: '준비',
+    doing: '진행',
+    done: '끝'
+  };
 
-    let currentAddColumnId = null;
+  let tasks = [];
+  let currentView = localStorage.getItem(VIEW_KEY) || 'today';
 
-    // --- INITIALIZATION ---
-    function init() {
-        // Load Theme
-        if (currentTheme === 'dark-mode') {
-            enableDarkMode();
-        } else {
-            enableLightMode();
-        }
+  const el = {
+    list: document.getElementById('card-list'),
+    tabs: document.querySelectorAll('.tab'),
+    quickInput: document.getElementById('quick-input'),
+    quickAddBtn: document.getElementById('quick-add-btn'),
+    empty: document.getElementById('empty-state'),
+    toast: document.getElementById('toast'),
+    statDone: document.getElementById('stat-done'),
+    statStreak: document.getElementById('stat-streak'),
+    statDelta: document.getElementById('stat-delta'),
+    statAlive: document.getElementById('stat-alive')
+  };
 
-        // Load Data
-        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedData) {
-            tasks = JSON.parse(savedData);
-        } else {
-            // Default Initial Data if empty
-            tasks = [
-                { id: 'REQ-402', title: 'RESEARCH MCP SPECS', body: 'Analyze Model Context Protocol.', tag: '[SYS-CORE]', status: 'todo' },
-                { id: 'TASK-88', title: 'UI GENERATION', body: 'Wireframes & Assets.', tag: '[DESIGN]', status: 'progress' }
-            ];
-        }
-        renderBoard();
-    }
+  function seedTasks() {
+    return [
+      {
+        id: crypto.randomUUID(),
+        title: '오늘 꼭 하나만 해볼 것',
+        note: '아주 작게 쪼개서 적어도 된다. 바로 수정 가능.',
+        status: 'today',
+        createdAt: Date.now(),
+        doneAt: null,
+        subtasks: []
+      },
+      {
+        id: crypto.randomUUID(),
+        title: '미루고 있었던 것',
+        note: '완벽하게 말고, 5분 버전으로 바꿔보자.',
+        status: 'today',
+        createdAt: Date.now() + 1,
+        doneAt: null,
+        subtasks: []
+      },
+      {
+        id: crypto.randomUUID(),
+        title: '5분이면 끝나는 일',
+        note: '지워도 되고, 지금 바로 완료해도 된다.',
+        status: 'today',
+        createdAt: Date.now() + 2,
+        doneAt: null,
+        subtasks: []
+      }
+    ];
+  }
 
-    // --- THEME ---
-    toggleBtn.addEventListener('click', () => {
-        if (body.classList.contains('light-mode')) {
-            enableDarkMode();
-        } else {
-            enableLightMode();
-        }
-    });
-
-    function enableDarkMode() {
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-        toggleBtn.textContent = 'DARK';
-        localStorage.setItem('theme', 'dark-mode');
-    }
-
-    function enableLightMode() {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        toggleBtn.textContent = 'LIGHT';
-        localStorage.setItem('theme', 'light-mode');
-    }
-
-    // --- RENDERING ---
-    function renderBoard() {
-        // Clear all columns
-        document.querySelectorAll('.column-content').forEach(col => col.innerHTML = '');
-
-        tasks.forEach(task => {
-            const card = createCardElement(task);
-            const column = document.querySelector(`.kanban-column[data-status="${task.status}"] .column-content`);
-            if (column) {
-                column.appendChild(card);
-            }
-        });
-
-        setupDragAndDrop();
-    }
-
-    function createCardElement(task) {
-        const div = document.createElement('div');
-        div.className = 'blueprint-card';
-        div.setAttribute('draggable', 'true');
-        div.setAttribute('data-id', task.id); // Valid attribute for DOM element
-
-        div.innerHTML = `
-            <button class="delete-card-btn" onclick="deleteTask('${task.id}')">×</button>
-            <div class="card-markers">
-                <div class="marker-tl"></div><div class="marker-tr"></div>
-                <div class="marker-bl"></div><div class="marker-br"></div>
-            </div>
-            <div class="card-id">${task.id}</div>
-            <div class="card-title">${task.title}</div>
-            <div class="card-body">${task.body}</div>
-            <div class="card-footer">
-                <span class="tag">${task.tag}</span>
-            </div>
-        `;
-        return div;
-    }
-
-    // --- DRAG AND DROP ---
-    function setupDragAndDrop() {
-        const draggables = document.querySelectorAll('.blueprint-card');
-        const columns = document.querySelectorAll('.column-content');
-
-        draggables.forEach(draggable => {
-            draggable.addEventListener('dragstart', () => {
-                draggable.classList.add('dragging');
-            });
-            draggable.addEventListener('dragend', () => {
-                draggable.classList.remove('dragging');
-                updateTaskStatus(draggable); // Update status after drop
-            });
-        });
-
-        columns.forEach(column => {
-            column.addEventListener('dragover', e => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(column, e.clientY);
-                const draggable = document.querySelector('.dragging');
-                if (afterElement == null) {
-                    column.appendChild(draggable);
-                } else {
-                    column.insertBefore(draggable, afterElement);
-                }
-            });
-        });
-    }
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.blueprint-card:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    function updateTaskStatus(cardElement) {
-        const newColumn = cardElement.closest('.kanban-column');
-        if (!newColumn) return;
-
-        const newStatus = newColumn.getAttribute('data-status');
-        const taskId = cardElement.getAttribute('data-id');
-
-        const taskIndex = tasks.findIndex(t => t.id === taskId);
-        if (taskIndex > -1) {
-            tasks[taskIndex].status = newStatus;
-            saveData(false); // Auto-save silently on move
-        }
-    }
-
-
-    // --- ADD / DELETE / SAVE LOGIC ---
-
-    // Exposed global functions for HTML inline onclick events
-    window.addNewCard = function (columnId) {
-        currentAddColumnId = columnId;
-        // Reset inputs
-        inputId.value = `REQ-${Math.floor(Math.random() * 1000)}`;
-        inputTitle.value = '';
-        inputDetails.value = '';
-        inputTag.value = '[NEW]';
-
-        modal.classList.remove('hidden');
-    };
-
-    window.deleteTask = function (id) {
-        if (confirm('CONFIRM DELETE: Are you sure?')) {
-            tasks = tasks.filter(t => t.id !== id);
-            renderBoard();
-            saveData(false);
-        }
-    };
-
-    closeModalBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    confirmAddBtn.addEventListener('click', () => {
-        const columnMap = { 'col-todo': 'todo', 'col-progress': 'progress', 'col-done': 'done' };
-        const status = columnMap[currentAddColumnId] || 'todo';
-
-        const newTask = {
-            id: inputId.value,
-            title: inputTitle.value,
-            body: inputDetails.value,
-            tag: inputTag.value,
-            status: status
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      tasks = raw ? JSON.parse(raw) : seedTasks();
+      if (!Array.isArray(tasks) || tasks.length === 0) {
+        tasks = seedTasks();
+      }
+      const statusMap = { todo: 'today', progress: 'now', done: 'done', backlog: 'later' };
+      tasks = tasks.map((task, index) => {
+        const normalizedStatus = statusMap[task.status] || task.status;
+        const safeStatus = ORDER.includes(normalizedStatus) ? normalizedStatus : 'today';
+        const subtasks = Array.isArray(task.subtasks)
+          ? task.subtasks.map((sub) => ({
+              id: sub.id || crypto.randomUUID(),
+              text: (sub.text || '작은 단계').trim(),
+              status: SUB_ORDER.includes(sub.status) ? sub.status : 'prep'
+            }))
+          : [];
+        return {
+          id: task.id || crypto.randomUUID(),
+          title: task.title || '새 일',
+          note: task.note ?? task.body ?? '',
+          status: safeStatus,
+          createdAt: Number(task.createdAt) || Date.now() + index,
+          doneAt: task.doneAt ? Number(task.doneAt) : null,
+          repeatDaily: Boolean(task.repeatDaily),
+          subtasks
         };
-
-        tasks.push(newTask);
-        renderBoard();
-        saveData(true);
-        modal.classList.add('hidden');
-    });
-
-    saveBtn.addEventListener('click', () => {
-        saveData(true);
-    });
-
-    function saveData(showFeedback) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tasks));
-        if (showFeedback) {
-            const originalText = saveStatus.innerText;
-            saveStatus.innerText = "SAVING...";
-            saveStatus.style.color = "var(--accent-color)";
-            setTimeout(() => {
-                saveStatus.innerText = "DATA SAVED";
-                setTimeout(() => {
-                    saveStatus.innerText = originalText;
-                    saveStatus.style.color = "inherit";
-                }, 1500);
-            }, 500);
-        }
+      });
+    } catch (error) {
+      tasks = seedTasks();
     }
 
-    // Run Init
-    init();
-});
+    if (!ORDER.includes(currentView)) {
+      currentView = 'today';
+    }
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    localStorage.setItem(VIEW_KEY, currentView);
+  }
+
+  function runDailyAutoRegistration() {
+    const todayKey = localDateKey(Date.now());
+    const lastSyncedKey = localStorage.getItem(DAILY_SYNC_KEY);
+    if (lastSyncedKey === todayKey) return;
+
+    let updatedCount = 0;
+    tasks.forEach((task, index) => {
+      if (!task.repeatDaily) return;
+      task.status = 'today';
+      task.doneAt = null;
+      task.createdAt = Date.now() + index;
+      updatedCount += 1;
+    });
+
+    localStorage.setItem(DAILY_SYNC_KEY, todayKey);
+    if (updatedCount > 0) {
+      save();
+    }
+  }
+
+  function localDateKey(timestamp) {
+    const d = new Date(timestamp);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function getStreak(doneDateSet) {
+    let streak = 0;
+    const cursor = new Date();
+    while (true) {
+      const key = localDateKey(cursor.getTime());
+      if (!doneDateSet.has(key)) break;
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function renderStats() {
+    const todayKey = localDateKey(Date.now());
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayKey = localDateKey(yesterday.getTime());
+
+    let doneToday = 0;
+    let doneYesterday = 0;
+    const doneDates = new Set();
+
+    tasks.forEach((task) => {
+      if (!task.doneAt) return;
+      const key = localDateKey(task.doneAt);
+      doneDates.add(key);
+      if (key === todayKey) doneToday += 1;
+      if (key === yesterdayKey) doneYesterday += 1;
+    });
+
+    const delta = doneToday - doneYesterday;
+    const alive = tasks.filter((task) => task.status !== 'done').length;
+    const streak = getStreak(doneDates);
+
+    el.statDone.textContent = `오늘 완료한 일: ${doneToday}`;
+    el.statStreak.textContent = `연속 ${streak}일째 마무리 중 ${streak >= 2 ? '🔥' : ''}`;
+    el.statDelta.textContent = `어제보다 ${delta >= 0 ? '+' : ''}${delta}`;
+    el.statAlive.textContent = `아직 살아 있는 일 ${alive}개`;
+  }
+
+  function showToast(message, isWarn = false) {
+    el.toast.textContent = message;
+    el.toast.style.color = isWarn ? 'var(--warn)' : '#ffd54f';
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => {
+      el.toast.textContent = '';
+    }, 1800);
+  }
+
+  function vibrate() {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(25);
+    }
+  }
+
+  function moveTask(taskId, direction) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task) return;
+
+    const fromIndex = ORDER.indexOf(task.status);
+    const toIndex = fromIndex + direction;
+    if (toIndex < 0 || toIndex >= ORDER.length) return;
+
+    const target = ORDER[toIndex];
+    if (target === 'now' && task.status !== 'now') {
+      const nowCount = tasks.filter((x) => x.status === 'now').length;
+      if (nowCount >= WIP_LIMIT_NOW) {
+        showToast(`지금은 ${WIP_LIMIT_NOW}개까지만 잡자`, true);
+        return;
+      }
+    }
+
+    task.status = target;
+    if (target === 'done') {
+      task.doneAt = Date.now();
+      vibrate();
+      showToast('하나 끝!');
+    }
+
+    save();
+    render();
+  }
+
+  function toggleDailyAuto(taskId) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task) return;
+
+    task.repeatDaily = !task.repeatDaily;
+    showToast(task.repeatDaily ? '매일 자동등록 ON' : '매일 자동등록 OFF');
+
+    save();
+    render();
+  }
+
+  function removeTask(taskId) {
+    tasks = tasks.filter((x) => x.id !== taskId);
+    save();
+    render();
+  }
+
+  function addTask() {
+    const value = el.quickInput.value.trim();
+    if (!value) return;
+
+    tasks.unshift({
+      id: crypto.randomUUID(),
+      title: value,
+      note: '',
+      status: currentView === 'done' ? 'today' : currentView,
+      createdAt: Date.now(),
+      doneAt: null,
+      repeatDaily: false,
+      subtasks: []
+    });
+
+    el.quickInput.value = '';
+    save();
+    render();
+  }
+
+  function updateTask(taskId, patch) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task) return;
+    Object.assign(task, patch);
+    save();
+    renderStats();
+  }
+
+  function addSubtask(taskId) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task) return;
+    if (!Array.isArray(task.subtasks)) task.subtasks = [];
+    task.subtasks.push({
+      id: crypto.randomUUID(),
+      text: '작은 단계',
+      status: 'prep'
+    });
+    save();
+    render();
+  }
+
+  function cycleSubtask(taskId, subtaskId) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task || !Array.isArray(task.subtasks)) return;
+    const subtask = task.subtasks.find((x) => x.id === subtaskId);
+    if (!subtask) return;
+    const idx = SUB_ORDER.indexOf(subtask.status);
+    subtask.status = SUB_ORDER[(idx + 1) % SUB_ORDER.length];
+    save();
+    render();
+  }
+
+  function removeSubtask(taskId, subtaskId) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task || !Array.isArray(task.subtasks)) return;
+    task.subtasks = task.subtasks.filter((x) => x.id !== subtaskId);
+    save();
+    render();
+  }
+
+  function updateSubtaskText(taskId, subtaskId, text) {
+    const task = tasks.find((x) => x.id === taskId);
+    if (!task || !Array.isArray(task.subtasks)) return;
+    const subtask = task.subtasks.find((x) => x.id === subtaskId);
+    if (!subtask) return;
+    subtask.text = text.trim() || '작은 단계';
+    save();
+    render();
+  }
+
+  function subtaskCounts(subtasks) {
+    const counts = { prep: 0, doing: 0, done: 0 };
+    subtasks.forEach((s) => {
+      if (counts[s.status] !== undefined) counts[s.status] += 1;
+    });
+    return counts;
+  }
+
+  function renderCard(task) {
+    const li = document.createElement('li');
+    li.className = 'card';
+    li.dataset.id = task.id;
+
+    const head = document.createElement('div');
+    head.className = 'card-head';
+
+    const badge = document.createElement('span');
+    badge.className = `badge badge-${task.status}`;
+    badge.textContent = LABELS[task.status] || task.status;
+
+    const actions = document.createElement('div');
+
+    const doneBtn = document.createElement('button');
+    doneBtn.className = `check-btn ${task.repeatDaily ? 'active' : ''}`;
+    doneBtn.type = 'button';
+    doneBtn.textContent = task.repeatDaily ? '매일ON' : '매일OFF';
+    doneBtn.addEventListener('click', () => toggleDailyAuto(task.id));
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.textContent = '삭제';
+    delBtn.addEventListener('click', () => removeTask(task.id));
+
+    actions.append(doneBtn, delBtn);
+    head.append(badge, actions);
+
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.contentEditable = 'true';
+    title.spellcheck = false;
+    title.textContent = task.title;
+    title.addEventListener('blur', () => {
+      const next = title.textContent.trim();
+      if (next) updateTask(task.id, { title: next });
+      else title.textContent = task.title;
+    });
+
+    const note = document.createElement('textarea');
+    note.className = 'card-note';
+    note.placeholder = '메모를 남겨도 좋고 비워도 된다';
+    note.value = task.note || '';
+    note.addEventListener('change', () => updateTask(task.id, { note: note.value }));
+
+    li.append(head, title, note);
+
+    const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+    const c = subtaskCounts(subtasks);
+    const mini = document.createElement('div');
+    mini.className = 'mini-flow';
+
+    const miniHead = document.createElement('div');
+    miniHead.className = 'mini-flow-head';
+    miniHead.innerHTML = `<span>작은 흐름 ${c.prep}/${c.doing}/${c.done}</span>`;
+
+    const addSubBtn = document.createElement('button');
+    addSubBtn.type = 'button';
+    addSubBtn.textContent = '+ 작은일';
+    addSubBtn.addEventListener('click', () => addSubtask(task.id));
+    miniHead.appendChild(addSubBtn);
+    mini.appendChild(miniHead);
+
+    subtasks.forEach((sub) => {
+      const row = document.createElement('div');
+      row.className = `subtask sub-${sub.status}`;
+
+      const text = document.createElement('input');
+      text.type = 'text';
+      text.value = sub.text;
+      text.setAttribute('aria-label', '작은일 내용');
+      text.addEventListener('change', () => updateSubtaskText(task.id, sub.id, text.value));
+      text.addEventListener('blur', () => updateSubtaskText(task.id, sub.id, text.value));
+
+      const stepBtn = document.createElement('button');
+      stepBtn.type = 'button';
+      stepBtn.textContent = SUB_LABELS[sub.status];
+      stepBtn.addEventListener('click', () => cycleSubtask(task.id, sub.id));
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '삭제';
+      removeBtn.addEventListener('click', () => removeSubtask(task.id, sub.id));
+
+      row.append(text, stepBtn, removeBtn);
+      mini.appendChild(row);
+    });
+
+    li.appendChild(mini);
+
+    wireSwipe(li, task.id);
+    return li;
+  }
+
+  function wireSwipe(node, taskId) {
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+
+    node.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('button, input, textarea, [contenteditable=\"true\"]')) return;
+      dragging = true;
+      startX = event.clientX;
+      currentX = 0;
+      node.classList.add('moving');
+      node.setPointerCapture(event.pointerId);
+    });
+
+    node.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      currentX = event.clientX - startX;
+      node.style.transform = `translateX(${Math.max(-120, Math.min(120, currentX))}px)`;
+    });
+
+    node.addEventListener('pointerup', (event) => {
+      if (!dragging) return;
+      dragging = false;
+      node.releasePointerCapture(event.pointerId);
+      node.classList.remove('moving');
+
+      if (currentX >= 70) {
+        moveTask(taskId, 1);
+      } else if (currentX <= -70) {
+        moveTask(taskId, -1);
+      }
+
+      node.style.transform = '';
+      currentX = 0;
+    });
+
+    node.addEventListener('pointercancel', () => {
+      dragging = false;
+      node.classList.remove('moving');
+      node.style.transform = '';
+      currentX = 0;
+    });
+  }
+
+  function renderTabs() {
+    el.tabs.forEach((tab) => {
+      const active = tab.dataset.view === currentView;
+      tab.classList.toggle('active', active);
+    });
+  }
+
+  function renderList() {
+    el.list.innerHTML = '';
+
+    const viewTasks = tasks
+      .filter((task) => task.status === currentView)
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    viewTasks.forEach((task) => {
+      el.list.appendChild(renderCard(task));
+    });
+
+    el.empty.classList.toggle('hidden', viewTasks.length > 0);
+  }
+
+  function render() {
+    renderTabs();
+    renderList();
+    renderStats();
+  }
+
+  function bindEvents() {
+    el.tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        currentView = tab.dataset.view;
+        save();
+        render();
+      });
+    });
+
+    el.quickAddBtn.addEventListener('click', addTask);
+    el.quickInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addTask();
+      }
+    });
+
+  }
+
+  load();
+  runDailyAutoRegistration();
+  bindEvents();
+  render();
+  save();
+})();
