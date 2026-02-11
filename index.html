@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>오늘 할 일 정리 앱</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +12,7 @@
   <div class="app">
     <header class="top">
       <div>
-        <h1>해야 할 것만 딱 </h1>
+        <h1>오늘 할 일을 정리해보세요</h1>
       </div>
     </header>
 
@@ -28,23 +25,23 @@
 
     <nav class="status-tabs" aria-label="상태 선택">
       <button class="tab" data-view="later" type="button">나중에</button>
-      <button class="tab active" data-view="today" type="button">오늘할일</button>
+      <button class="tab active" data-view="today" type="button">오늘 할 일</button>
       <button class="tab" data-view="now" type="button">지금</button>
       <button class="tab" data-view="done" type="button">완료</button>
     </nav>
 
     <section class="quick-add">
-      <input id="quick-input" type="text" maxlength="80" placeholder="지금 떠오른 일 한 줄로 적기">
+      <input id="quick-input" type="text" maxlength="80" placeholder="지금 떠오른 일을 한 줄로 적어주세요">
       <button id="quick-add-btn" type="button">추가</button>
     </section>
 
     <main>
       <ul id="card-list" class="card-list" aria-live="polite"></ul>
-      <p id="empty-state" class="empty hidden">비어 있어도 괜찮아. 위에서 한 줄만 추가해봐.</p>
+      <p id="empty-state" class="empty hidden">아직 등록된 일이 없습니다. 위에서 한 줄을 추가해보세요.</p>
     </main>
 
     <footer class="foot">
-      <p>좌우 스와이프, 오른쪽: 다음 / 왼쪽: 이전</p>
+      <p>좌우로 스와이프해 주세요. 오른쪽: 다음 / 왼쪽: 이전</p>
       <p id="toast" class="toast" aria-live="assertive"></p>
     </footer>
   </div>

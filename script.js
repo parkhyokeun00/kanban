@@ -7,7 +7,7 @@
   const ORDER = ['later', 'today', 'now', 'done'];
   const LABELS = {
     later: '나중에',
-    today: '오늘할일',
+    today: '오늘 할 일',
     now: '지금',
     done: '완료'
   };
@@ -39,8 +39,8 @@
     return [
       {
         id: crypto.randomUUID(),
-        title: '오늘 꼭 하나만 해볼 것',
-        note: '아주 작게 쪼개서 적어도 된다. 바로 수정 가능.',
+        title: '오늘 꼭 하나만 해볼 일을 적어보세요',
+        note: '아주 작게 나눠 적으셔도 됩니다. 언제든 바로 수정하실 수 있어요.',
         status: 'today',
         createdAt: Date.now(),
         doneAt: null,
@@ -48,8 +48,8 @@
       },
       {
         id: crypto.randomUUID(),
-        title: '미루고 있었던 것',
-        note: '완벽하게 말고, 5분 버전으로 바꿔보자.',
+        title: '미루고 있던 일을 가볍게 시작해보세요',
+        note: '완벽하지 않아도 괜찮습니다. 5분 버전으로 바꿔서 시작해보세요.',
         status: 'today',
         createdAt: Date.now() + 1,
         doneAt: null,
@@ -57,8 +57,8 @@
       },
       {
         id: crypto.randomUUID(),
-        title: '5분이면 끝나는 일',
-        note: '지워도 되고, 지금 바로 완료해도 된다.',
+        title: '5분 안에 끝낼 수 있는 일을 적어보세요',
+        note: '필요 없으면 지우셔도 되고, 지금 바로 완료하셔도 됩니다.',
         status: 'today',
         createdAt: Date.now() + 2,
         doneAt: null,
@@ -205,7 +205,7 @@
     if (target === 'now' && task.status !== 'now') {
       const nowCount = tasks.filter((x) => x.status === 'now').length;
       if (nowCount >= WIP_LIMIT_NOW) {
-        showToast(`지금은 ${WIP_LIMIT_NOW}개까지만 잡자`, true);
+        showToast(`지금 단계는 ${WIP_LIMIT_NOW}개까지만 유지해 주세요.`, true);
         return;
       }
     }
@@ -214,7 +214,7 @@
     if (target === 'done') {
       task.doneAt = Date.now();
       vibrate();
-      showToast('하나 끝!');
+      showToast('하나 완료하셨어요!');
     }
 
     save();
@@ -226,7 +226,7 @@
     if (!task) return;
 
     task.repeatDaily = !task.repeatDaily;
-    showToast(task.repeatDaily ? '매일 자동등록 ON' : '매일 자동등록 OFF');
+    showToast(task.repeatDaily ? '매일 자동 등록이 켜졌습니다.' : '매일 자동 등록이 꺼졌습니다.');
 
     save();
     render();
@@ -357,7 +357,7 @@
 
     const note = document.createElement('textarea');
     note.className = 'card-note';
-    note.placeholder = '메모를 남겨도 좋고 비워도 된다';
+    note.placeholder = '메모를 남겨주셔도 좋고, 비워두셔도 괜찮습니다.';
     note.value = task.note || '';
     note.addEventListener('change', () => updateTask(task.id, { note: note.value }));
 

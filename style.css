@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #f4f0e6;
   --ink: #101010;
   --paper: #fff9ea;
@@ -9,6 +9,8 @@
   --warn: #c62828;
   --radius: 0;
   --shadow: 5px 5px 0 #101010;
+  --line-thin: 1px;
+  --line-thick: 1.5px;
 }
 
 * {
@@ -21,7 +23,7 @@ body {
   background:
     linear-gradient(135deg, #f4f0e6 0%, #efe8d8 100%);
   color: var(--ink);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Kimjungchul Gothic', 'KimjungchulGothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   min-height: 100vh;
 }
 
@@ -54,10 +56,10 @@ body {
 }
 
 .eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   font-size: 12px;
   letter-spacing: 1px;
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   display: inline-block;
   padding: 2px 8px;
   background: #ffe6d6;
@@ -71,21 +73,21 @@ h1 {
 }
 
 .ghost {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: #fff;
   padding: 10px 12px;
   font-weight: 700;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   box-shadow: var(--shadow);
 }
 
 .summary {
-  border: 3px solid var(--line);
+  border: var(--line-thick) solid var(--line);
   background: var(--paper);
   padding: 12px;
   display: grid;
   gap: 4px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   box-shadow: var(--shadow);
 }
 
@@ -100,7 +102,7 @@ h1 {
 }
 
 .tab {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: #fff;
   padding: 10px 4px;
   font-weight: 700;
@@ -121,7 +123,7 @@ h1 {
 }
 
 .quick-add input {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: #fff;
   font-size: 16px;
   padding: 12px;
@@ -129,7 +131,7 @@ h1 {
 }
 
 .quick-add button {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: var(--accent);
   color: #fff;
   font-weight: 700;
@@ -146,7 +148,7 @@ h1 {
 }
 
 .card {
-  border: 3px solid var(--line);
+  border: var(--line-thick) solid var(--line);
   background: #fff;
   box-shadow: var(--shadow);
   padding: 12px;
@@ -167,10 +169,10 @@ h1 {
 }
 
 .badge {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   padding: 2px 8px;
   font-size: 12px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   font-weight: 600;
   color: #fff;
 }
@@ -193,9 +195,9 @@ h1 {
 }
 
 .card button {
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: #fff;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   padding: 4px 8px;
   font-size: 12px;
   font-weight: 600;
@@ -216,17 +218,17 @@ h1 {
 
 .card-note {
   width: 100%;
-  border: 2px dashed #8a8a8a;
+  border: var(--line-thin) dashed #8a8a8a;
   padding: 8px;
   resize: vertical;
   min-height: 60px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   font-size: 13px;
 }
 
 .mini-flow {
   margin-top: 10px;
-  border-top: 2px solid var(--line);
+  border-top: var(--line-thin) solid var(--line);
   padding-top: 10px;
   display: grid;
   gap: 6px;
@@ -236,7 +238,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   font-size: 12px;
 }
 
@@ -248,10 +250,10 @@ h1 {
 
 .subtask input {
   flex: 1;
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   padding: 5px 8px;
   background: #fff;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   font-size: 12px;
 }
 
@@ -274,10 +276,10 @@ h1 {
 }
 
 .empty {
-  border: 2px dashed var(--line);
+  border: var(--line-thin) dashed var(--line);
   padding: 16px;
   background: #fff;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
 }
 
 .hidden {
@@ -287,11 +289,11 @@ h1 {
 .foot {
   position: sticky;
   bottom: 10px;
-  border: 2px solid var(--line);
+  border: var(--line-thin) solid var(--line);
   background: #101010;
   color: #fff;
   padding: 8px 10px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   display: grid;
   gap: 4px;
 }
