@@ -299,9 +299,10 @@ h1 {
 .foot {
   position: sticky;
   bottom: 10px;
-  border: var(--line-thin) solid var(--line);
-  background: #101010;
-  color: #fff;
+  border: var(--line-thick) solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
   padding: 8px 10px;
   font-family: inherit;
   display: grid;

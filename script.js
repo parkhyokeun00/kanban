@@ -387,6 +387,11 @@
       text.type = 'text';
       text.value = sub.text;
       text.setAttribute('aria-label', '작은일 내용');
+      text.addEventListener('focus', () => {
+        if (text.value.trim() === '작은 단계') {
+          text.value = '';
+        }
+      });
       text.addEventListener('change', () => updateSubtaskText(task.id, sub.id, text.value));
       text.addEventListener('blur', () => updateSubtaskText(task.id, sub.id, text.value));
 
