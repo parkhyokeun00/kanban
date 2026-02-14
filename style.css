@@ -20,11 +20,20 @@
 }
 
 body {
-  background:
-    linear-gradient(135deg, #f4f0e6 0%, #efe8d8 100%);
+  background: var(--bg);
   color: var(--ink);
   font-family: 'Kimjungchul Gothic', 'KimjungchulGothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   min-height: 100vh;
+}
+
+.bg-shader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.58;
 }
 
 .noise {
@@ -33,12 +42,13 @@ body {
   pointer-events: none;
   background-image: radial-gradient(rgba(0, 0, 0, 0.08) 0.6px, transparent 0.6px);
   background-size: 3px 3px;
-  opacity: 0.2;
+  opacity: 0.1;
+  z-index: 1;
 }
 
 .app {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 720px;
   margin: 0 auto;
   min-height: 100vh;
