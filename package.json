@@ -1,0 +1,19 @@
+{
+  "name": "todaystep",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "granite dev",
+    "build": "granite build",
+    "web:dev": "vite --host",
+    "web:build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "^1.11.2",
+    "@toss/tds-mobile": "^2.2.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}
