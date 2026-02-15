@@ -1,8 +1,14 @@
-﻿(() => {
+import { GoogleAdMob } from '@apps-in-toss/web-framework';
+
+(() => {
   const STORAGE_KEY = 'focus_list_v3';
   const VIEW_KEY = 'focus_list_view';
   const DAILY_SYNC_KEY = 'focus_list_daily_sync_date';
   const WIP_LIMIT_NOW = 3;
+  const AD_GROUP_ID = import.meta.env.VITE_TOSS_INTERSTITIAL_AD_GROUP_ID || 'ait-ad-test-interstitial-id';
+  const AD_TRIGGER_COMPLETIONS = 3;
+  const AD_COOLDOWN_MS = 90 * 1000;
+  const AD_MAX_PER_SESSION = 3;
 
   const ORDER = ['later', 'today', 'now', 'done'];
   const LABELS = {
@@ -19,8 +25,33 @@
     done: '끝'
   };
 
+  function getInitialViewFromUrl() {
+    try {
+      const path = (window.location.pathname || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (ORDER.includes(path)) return path;
+
+      // Keep backward compatibility for older links like ?view=today
+      const queryView = new URLSearchParams(window.location.search).get('view');
+      if (queryView && ORDER.includes(queryView)) return queryView;
+    } catch (error) {
+      return null;
+    }
+    return null;
+  }
+
+  const adState = {
+    loaded: false,
+    loading: false,
+    showing: false,
+    completedSinceLastShow: 0,
+    lastShownAt: 0,
+    shownCountInSession: 0,
+    loadCleanup: null,
+    showCleanup: null
+  };
+
   let tasks = [];
-  let currentView = localStorage.getItem(VIEW_KEY) || 'today';
+  let currentView = getInitialViewFromUrl() || localStorage.getItem(VIEW_KEY) || 'today';
 
   const el = {
     list: document.getElementById('card-list'),
@@ -193,6 +224,101 @@
     }
   }
 
+  function isAdMobSupported() {
+    try {
+      return (
+        GoogleAdMob?.loadAppsInTossAdMob?.isSupported?.() === true &&
+        GoogleAdMob?.showAppsInTossAdMob?.isSupported?.() === true
+      );
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function safeCleanup(fn) {
+    if (typeof fn === 'function') {
+      try {
+        fn();
+      } catch (error) {
+        // ignore cleanup errors from bridge subscriptions
+      }
+    }
+  }
+
+  function preloadInterstitialAd() {
+    if (!isAdMobSupported()) return;
+    if (adState.loading || adState.loaded || adState.showing) return;
+    if (adState.shownCountInSession >= AD_MAX_PER_SESSION) return;
+
+    safeCleanup(adState.loadCleanup);
+    adState.loading = true;
+    adState.loadCleanup = GoogleAdMob.loadAppsInTossAdMob({
+      options: { adGroupId: AD_GROUP_ID },
+      onEvent: (event) => {
+        if (event.type === 'loaded') {
+          adState.loaded = true;
+          adState.loading = false;
+          safeCleanup(adState.loadCleanup);
+          adState.loadCleanup = null;
+        }
+      },
+      onError: () => {
+        adState.loaded = false;
+        adState.loading = false;
+        safeCleanup(adState.loadCleanup);
+        adState.loadCleanup = null;
+      }
+    });
+  }
+
+  function tryShowInterstitialAd() {
+    if (!isAdMobSupported()) return;
+    if (!adState.loaded || adState.showing) return;
+    if (adState.shownCountInSession >= AD_MAX_PER_SESSION) return;
+    if (adState.completedSinceLastShow < AD_TRIGGER_COMPLETIONS) return;
+    if (Date.now() - adState.lastShownAt < AD_COOLDOWN_MS) return;
+
+    adState.showing = true;
+    safeCleanup(adState.showCleanup);
+    adState.showCleanup = GoogleAdMob.showAppsInTossAdMob({
+      options: { adGroupId: AD_GROUP_ID },
+      onEvent: (event) => {
+        if (event.type === 'dismissed') {
+          adState.showing = false;
+          adState.loaded = false;
+          adState.lastShownAt = Date.now();
+          adState.shownCountInSession += 1;
+          adState.completedSinceLastShow = 0;
+          safeCleanup(adState.showCleanup);
+          adState.showCleanup = null;
+          preloadInterstitialAd();
+          return;
+        }
+
+        if (event.type === 'failedToShow') {
+          adState.showing = false;
+          adState.loaded = false;
+          safeCleanup(adState.showCleanup);
+          adState.showCleanup = null;
+          preloadInterstitialAd();
+        }
+      },
+      onError: () => {
+        adState.showing = false;
+        adState.loaded = false;
+        safeCleanup(adState.showCleanup);
+        adState.showCleanup = null;
+        preloadInterstitialAd();
+      }
+    });
+  }
+
+  function onTaskCompletedForAd() {
+    adState.completedSinceLastShow += 1;
+    tryShowInterstitialAd();
+    preloadInterstitialAd();
+  }
+
   function moveTask(taskId, direction) {
     const task = tasks.find((x) => x.id === taskId);
     if (!task) return;
@@ -215,6 +341,7 @@
       task.doneAt = Date.now();
       vibrate();
       showToast('하나 완료하셨어요!');
+      onTaskCompletedForAd();
     }
 
     save();
@@ -506,6 +633,7 @@
   }
 
   load();
+  preloadInterstitialAd();
   runDailyAutoRegistration();
   bindEvents();
   render();
