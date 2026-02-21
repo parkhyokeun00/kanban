@@ -9,6 +9,7 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
   const AD_TRIGGER_COMPLETIONS = 3;
   const AD_COOLDOWN_MS = 90 * 1000;
   const AD_MAX_PER_SESSION = 3;
+  const AD_SHOW_TIMEOUT_MS = 15000;
 
   const ORDER = ['later', 'today', 'now', 'done'];
   const LABELS = {
@@ -47,7 +48,8 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
     lastShownAt: 0,
     shownCountInSession: 0,
     loadCleanup: null,
-    showCleanup: null
+    showCleanup: null,
+    showTimeoutId: null
   };
 
   let tasks = [];
@@ -224,7 +226,19 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
     }
   }
 
+  function getAndroidMajorVersion() {
+    const ua = navigator.userAgent || '';
+    const match = ua.match(/Android\s+(\d+)/i);
+    return match ? Number(match[1]) : null;
+  }
+
+  function isAdDisabledDevice() {
+    const androidMajor = getAndroidMajorVersion();
+    return androidMajor !== null && androidMajor <= 9;
+  }
+
   function isAdMobSupported() {
+    if (isAdDisabledDevice()) return false;
     try {
       return (
         GoogleAdMob?.loadAppsInTossAdMob?.isSupported?.() === true &&
@@ -245,6 +259,35 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
     }
   }
 
+  function clearAdShowTimeout() {
+    if (adState.showTimeoutId != null) {
+      clearTimeout(adState.showTimeoutId);
+      adState.showTimeoutId = null;
+    }
+  }
+
+  function getAdEventType(event) {
+    return typeof event?.type === 'string' ? event.type : '';
+  }
+
+  function recoverInteractionLock() {
+    if (document.body && document.body.style.pointerEvents === 'none') {
+      document.body.style.pointerEvents = '';
+    }
+    if (document.documentElement && document.documentElement.style.pointerEvents === 'none') {
+      document.documentElement.style.pointerEvents = '';
+    }
+  }
+
+  function resetAdShowingState() {
+    adState.showing = false;
+    adState.loaded = false;
+    clearAdShowTimeout();
+    safeCleanup(adState.showCleanup);
+    adState.showCleanup = null;
+    recoverInteractionLock();
+  }
+
   function preloadInterstitialAd() {
     if (!isAdMobSupported()) return;
     if (adState.loading || adState.loaded || adState.showing) return;
@@ -255,8 +298,17 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
     adState.loadCleanup = GoogleAdMob.loadAppsInTossAdMob({
       options: { adGroupId: AD_GROUP_ID },
       onEvent: (event) => {
-        if (event.type === 'loaded') {
+        const type = getAdEventType(event);
+        if (type === 'loaded') {
           adState.loaded = true;
+          adState.loading = false;
+          safeCleanup(adState.loadCleanup);
+          adState.loadCleanup = null;
+          return;
+        }
+
+        if (type === 'failedToLoad' || type === 'error' || type === 'closed') {
+          adState.loaded = false;
           adState.loading = false;
           safeCleanup(adState.loadCleanup);
           adState.loadCleanup = null;
@@ -279,38 +331,41 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
     if (Date.now() - adState.lastShownAt < AD_COOLDOWN_MS) return;
 
     adState.showing = true;
-    safeCleanup(adState.showCleanup);
-    adState.showCleanup = GoogleAdMob.showAppsInTossAdMob({
-      options: { adGroupId: AD_GROUP_ID },
-      onEvent: (event) => {
-        if (event.type === 'dismissed') {
-          adState.showing = false;
-          adState.loaded = false;
-          adState.lastShownAt = Date.now();
-          adState.shownCountInSession += 1;
-          adState.completedSinceLastShow = 0;
-          safeCleanup(adState.showCleanup);
-          adState.showCleanup = null;
-          preloadInterstitialAd();
-          return;
-        }
+    clearAdShowTimeout();
+    adState.showTimeoutId = setTimeout(() => {
+      resetAdShowingState();
+      preloadInterstitialAd();
+    }, AD_SHOW_TIMEOUT_MS);
 
-        if (event.type === 'failedToShow') {
-          adState.showing = false;
-          adState.loaded = false;
-          safeCleanup(adState.showCleanup);
-          adState.showCleanup = null;
+    safeCleanup(adState.showCleanup);
+    try {
+      adState.showCleanup = GoogleAdMob.showAppsInTossAdMob({
+        options: { adGroupId: AD_GROUP_ID },
+        onEvent: (event) => {
+          const type = getAdEventType(event);
+          if (type === 'dismissed' || type === 'closed' || type === 'hidden') {
+            resetAdShowingState();
+            adState.lastShownAt = Date.now();
+            adState.shownCountInSession += 1;
+            adState.completedSinceLastShow = 0;
+            preloadInterstitialAd();
+            return;
+          }
+
+          if (type === 'failedToShow' || type === 'error') {
+            resetAdShowingState();
+            preloadInterstitialAd();
+          }
+        },
+        onError: () => {
+          resetAdShowingState();
           preloadInterstitialAd();
         }
-      },
-      onError: () => {
-        adState.showing = false;
-        adState.loaded = false;
-        safeCleanup(adState.showCleanup);
-        adState.showCleanup = null;
-        preloadInterstitialAd();
-      }
-    });
+      });
+    } catch (error) {
+      resetAdShowingState();
+      preloadInterstitialAd();
+    }
   }
 
   function onTaskCompletedForAd() {
@@ -366,23 +421,29 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
   }
 
   function addTask() {
-    const value = el.quickInput.value.trim();
-    if (!value) return;
+    try {
+      const value = el.quickInput.value.trim();
+      if (!value) return;
 
-    tasks.unshift({
-      id: crypto.randomUUID(),
-      title: value,
-      note: '',
-      status: currentView === 'done' ? 'today' : currentView,
-      createdAt: Date.now(),
-      doneAt: null,
-      repeatDaily: false,
-      subtasks: []
-    });
+      tasks.unshift({
+        id: crypto.randomUUID(),
+        title: value,
+        note: '',
+        status: currentView === 'done' ? 'today' : currentView,
+        createdAt: Date.now(),
+        doneAt: null,
+        repeatDaily: false,
+        subtasks: []
+      });
 
-    el.quickInput.value = '';
-    save();
-    render();
+      el.quickInput.value = '';
+      save();
+      render();
+    } catch (error) {
+      recoverInteractionLock();
+      resetAdShowingState();
+      showToast('일시 오류가 발생했어요. 다시 시도해 주세요.', true);
+    }
   }
 
   function updateTask(taskId, patch) {
@@ -630,6 +691,22 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
       }
     });
 
+    // Some ad SDK flows can leave touch lock behind after close.
+    window.addEventListener('focus', recoverInteractionLock);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        recoverInteractionLock();
+      }
+    });
+
+    window.addEventListener('error', () => {
+      recoverInteractionLock();
+      resetAdShowingState();
+    });
+    window.addEventListener('unhandledrejection', () => {
+      recoverInteractionLock();
+      resetAdShowingState();
+    });
   }
 
   load();
@@ -644,7 +721,22 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
   const canvas = document.getElementById('bg-shader');
   if (!canvas) return;
 
+  function getAndroidMajorVersion() {
+    const ua = navigator.userAgent || '';
+    const match = ua.match(/Android\s+(\d+)/i);
+    return match ? Number(match[1]) : null;
+  }
+
+  function isLowSpecDevice() {
+    const androidMajor = getAndroidMajorVersion();
+    const lowAndroid = androidMajor !== null && androidMajor <= 9;
+    const lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4;
+    const lowCpu = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
+    return lowAndroid || lowMemory || lowCpu;
+  }
+
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const disableAnimatedShader = prefersReducedMotion || isLowSpecDevice();
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -767,14 +859,14 @@ import { GoogleAdMob } from '@apps-in-toss/web-framework';
 
   function animate() {
     drawFrame();
-    if (!prefersReducedMotion) {
+    if (!disableAnimatedShader) {
       rafId = window.requestAnimationFrame(animate);
     }
   }
 
   function handleResize() {
     rebuild();
-    if (prefersReducedMotion) drawFrame();
+    if (disableAnimatedShader) drawFrame();
   }
 
   rebuild();
